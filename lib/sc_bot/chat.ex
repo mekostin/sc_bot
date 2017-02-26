@@ -29,11 +29,13 @@ defmodule ScBot.Chat do
 
   def handle_cast({:request, message}, state) do
     Logger.info "CHAT " <> inspect(self()) <> ": requested "
-     <> message[:message][:text]
 
      case message[:message] do
-       %{message_id: message_id, text: text, from: %{id: chat_id, first_name: first_name, last_name: last_name}} ->
-          state=[%ScBot.Message{chat_id: chat_id, text: first_name<>" "<>last_name<>" send me: "<>text, reply_to_message_id: message_id} | state]
+       %{message_id: message_id, text: text, from: %{id: chat_id, first_name: first_name}} ->
+          state=[%ScBot.Message{chat_id: chat_id, text: first_name<>" "<>" send me: "<>text, reply_to_message_id: message_id} | state]
+       %{message_id: message_id, sticker: sticker, from: %{id: chat_id, first_name: first_name}} ->
+          state=[%ScBot.Message{chat_id: chat_id, text: first_name<>" "<>" send me: SOME STICKER!!", reply_to_message_id: message_id} | state]
+
        _ -> Logger.error "cant parse request"
      end
 

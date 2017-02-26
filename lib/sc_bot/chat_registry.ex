@@ -41,8 +41,6 @@ defmodule ScBot.ChatRegistry do
     Logger.info Integer.to_string(task[:message][:chat][:id])
                 <> " " <>
                 Integer.to_string(task[:message][:message_id])
-                <> " " <>
-                task[:message][:text]
 
     chat_id=task[:message][:chat][:id]
 
