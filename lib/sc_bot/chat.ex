@@ -16,8 +16,8 @@ defmodule ScBot.Chat do
     GenServer.cast(via_tuple(chat_name), {:request, message})
   end
 
-  def response(chat_name) do
-    GenServer.call(via_tuple(chat_name), :response)
+  def response(pid) do
+    GenServer.call(pid, :response)
   end
 
   def init(state) do
@@ -28,7 +28,7 @@ defmodule ScBot.Chat do
   def handle_cast({:request, message}, state) do
     Logger.info "CHAT " <> inspect(self()) <> ": requested "
      <> message[:message][:text]
-    {:noreply, []}
+    {:noreply, [message[:message][:text] | state]}
   end
 
  def handle_call(:response, _from, state) do

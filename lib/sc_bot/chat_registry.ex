@@ -13,6 +13,10 @@ defmodule ScBot.ChatRegistry do
     GenServer.cast(:chat_registrator, {:process_chats, tasks})
   end
 
+  def get_answers do
+    GenServer.call(:chat_registrator, :get_answers)
+  end
+
   #SERVER
    def init(_) do
      Logger.info "#{__MODULE__}: "<> inspect(self()) <>" init"
@@ -28,6 +32,11 @@ defmodule ScBot.ChatRegistry do
     {:noreply, []}
   end
 
+  def handle_call(:get_answers, _from, state) do
+    Logger.info "#{__MODULE__}: "<> inspect(self()) <>" handle_call "
+    {:reply, ScBot.Chat.Supervisor.get_answers, [1,2,3]}
+  end
+
   defp proc_task(task, state) do
     Logger.info Integer.to_string(task[:message][:chat][:id])
                 <> " " <>
@@ -41,7 +50,7 @@ defmodule ScBot.ChatRegistry do
 
     Logger.info "create new chat " <> Integer.to_string(chat_id)
     ScBot.Chat.Supervisor.start_chat(Integer.to_string(chat_id))
-    ScBot.Chat.request(Integer.to_string(chat_id), task) 
+    ScBot.Chat.request(Integer.to_string(chat_id), task)
 
   end
 end

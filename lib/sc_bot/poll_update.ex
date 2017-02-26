@@ -37,8 +37,10 @@ defmodule ScBot.PollUpdatesTask do
       last_update_id=update_id+1
     end
 
-    :timer.sleep(5000)
+    answers=ScBot.ChatRegistry.get_answers
+    Logger.info "get " <> Integer.to_string(Enum.count(answers)) <> " answers"
 
+    :timer.sleep(5000)
     poll(last_update_id)
   end
 end
