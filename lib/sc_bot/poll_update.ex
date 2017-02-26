@@ -7,7 +7,8 @@ defmodule ScBot.PollUpdatesTask do
     update_id=0
     Logger.info "Poll TelegramBot #{last_update_id}"
 
-    url="https://api.telegram.org/bot" <> token <> "/getUpdates"
+    bot="https://api.telegram.org/bot" <> token
+    url=bot <> "/getUpdates"
 
     if last_update_id != 0 do
       Logger.info "last_update_id: #{last_update_id}"
@@ -37,10 +38,16 @@ defmodule ScBot.PollUpdatesTask do
       last_update_id=update_id+1
     end
 
-    answers=ScBot.ChatRegistry.get_answers
-    Logger.info "get " <> Integer.to_string(Enum.count(answers)) <> " answers"
+    Enum.each(ScBot.ChatRegistry.get_answers, fn(%ScBot.Message{chat_id: chat_id, text: text, reply_to_message_id: reply_to_message_id}) ->
+      surl=bot <> "/sendMessage?"
+                        <> "chat_id=" <> Integer.to_string(chat_id)
+                        <> "&reply_to_message_id=" <> Integer.to_string(reply_to_message_id)
+                        <> "&text=\"" <> text <> "\""
+      Logger.info "HTTPSend: " <> surl
+      HTTPoison.get(surl)
+     end)
 
-    :timer.sleep(5000)
+   :timer.sleep(5000)
     poll(last_update_id)
   end
 end

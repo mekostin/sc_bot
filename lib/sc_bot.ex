@@ -22,11 +22,11 @@ defmodule ScBot do
     opts=[strategy: :one_for_one, name: :scbot_main]
 
     Logger.info "Starting main Supervisor.."
-    Supervisor.start_link(children, opts)
+    {:ok, spid}=Supervisor.start_link(children, opts)
 
     Logger.info "Polling for updates.."
     Task.Supervisor.start_link(name: @task_poller_supervisor, restart: :transient, max_restarts: 0)
     Task.Supervisor.start_child(@task_poller_supervisor, @task_poller, :poll, [0])
-
+    {:ok, spid}
   end
 end

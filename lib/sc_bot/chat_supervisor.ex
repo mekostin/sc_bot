@@ -19,12 +19,10 @@ defmodule ScBot.Chat.Supervisor do
   end
 
   def get_answers do
-    pids=[]
-    Enum.each(Supervisor.which_children(:chat_supervisor), fn({id, pid, type, modules}) ->
-      Logger.info "CHILD " <> inspect(pid)
-      ScBot.Chat.response(pid) ++ pids
-    end)
-    pids
+    Enum.reduce(Supervisor.which_children(:chat_supervisor), [],
+      fn({id, pid, type, modules}, ack) ->
+        ScBot.Chat.response(pid) ++ ack
+      end)
   end
 
 end

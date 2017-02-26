@@ -34,7 +34,7 @@ defmodule ScBot.ChatRegistry do
 
   def handle_call(:get_answers, _from, state) do
     Logger.info "#{__MODULE__}: "<> inspect(self()) <>" handle_call "
-    {:reply, ScBot.Chat.Supervisor.get_answers, [1,2,3]}
+    {:reply, ScBot.Chat.Supervisor.get_answers, []}
   end
 
   defp proc_task(task, state) do
