@@ -18,7 +18,7 @@ defmodule ScBot.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [
-      applications: [:logger, :httpoison, :poison, :gproc],
+      applications: [:logger, :httpoison, :poison, :gproc, :postgrex],
       mod: {ScBot, []}
     ]
   end
@@ -40,7 +40,8 @@ defmodule ScBot.Mixfile do
     [
       {:httpoison, "~> 0.10.0"},
       {:poison, "~> 1.3"},
-      {:gproc, "0.3.1"}
+      {:gproc, "0.3.1"},
+      {:postgrex, ">= 0.9.1"}
     ]
   end
 end

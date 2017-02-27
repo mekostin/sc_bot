@@ -30,21 +30,25 @@ defmodule ScBot.Chat do
   def handle_cast({:request, message}, state) do
     Logger.info "CHAT " <> inspect(self()) <> ": requested "
 
-     case message[:message] do
-       %{message_id: message_id, text: text, from: %{id: chat_id, first_name: first_name}} ->
-          state=[%ScBot.Message{chat_id: chat_id, text: first_name<>" "<>" send me: "<>text, reply_to_message_id: message_id} | state]
-       %{message_id: message_id, sticker: sticker, from: %{id: chat_id, first_name: first_name}} ->
-          state=[%ScBot.Message{chat_id: chat_id, text: first_name<>" "<>" send me: SOME STICKER!!", reply_to_message_id: message_id} | state]
-
-       _ -> Logger.error "cant parse request"
-     end
+    case message[:message] do
+      %{message_id: message_id, text: text, chat: %{id: chat_id}} ->
+        cond do
+          String.match?(text, ~r/^dbinfo\ ATM_\d{2,5}$/) -> dbinfo_task(List.last(String.split(text)))
+          true -> state=[%ScBot.Message{chat_id: chat_id, text: "uncknown cmd: "<>text, reply_to_message_id: message_id} | state]
+         end
+      _ -> Logger.error "cant parse request"
+    end
 
     {:noreply, state}
   end
 
- def handle_call(:response, _from, state) do
-   Logger.info "CHAT " <> inspect(self()) <> ": responsed: "
-   {:reply, state, []}
- end
+  def handle_call(:response, _from, state) do
+    Logger.info "CHAT " <> inspect(self()) <> ": responsed: "
+    {:reply, state, []}
+  end
+
+  defp dbinfo_task(item) do
+    Logger.info "DBINFO: " <> item
+  end
 
 end

@@ -44,8 +44,6 @@ defmodule ScBot.ChatRegistry do
 
     chat_id=task[:message][:chat][:id]
 
-
-
     Logger.info "create new chat " <> Integer.to_string(chat_id)
     ScBot.Chat.Supervisor.start_chat(Integer.to_string(chat_id))
     ScBot.Chat.request(Integer.to_string(chat_id), task)
