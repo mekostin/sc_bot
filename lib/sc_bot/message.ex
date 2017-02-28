@@ -16,4 +16,4 @@ end
 
 
 
-# %{message: %{message_id: 49, %{from: %{id: 349243463, first_name: "Mikhail", last_name: "Kostin"}, text:"\u0440\u0440\u043e"}}]}
+#%{message: %{message_id: 49, chat: %{id: 349243463}, text: "asd"}}

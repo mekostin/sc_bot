@@ -16,7 +16,7 @@ defmodule ScBot do
     import Supervisor.Spec, warn: false
     children = [
       supervisor(@chat_supervisor, []),
-      worker(@chat_registrator, [%{}])
+      worker(@chat_registrator, [])
     ]
 
     opts=[strategy: :one_for_one, name: :scbot_main]
