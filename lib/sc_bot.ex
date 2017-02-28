@@ -6,7 +6,6 @@ defmodule ScBot do
   @task_poller_supervisor ScBot.PollUpdatesTask.Supervisor
   @chat_registrator ScBot.ChatRegistry
   @chat_supervisor ScBot.Chat.Supervisor
-  @ecto_supervisor ScBot.Repo
 
   def version do
     {:ok, version}=:application.get_key(:sc_bot, :vsn)
@@ -16,7 +15,6 @@ defmodule ScBot do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
     children = [
-      supervisor(@ecto_supervisor, []),
       supervisor(@chat_supervisor, []),
       worker(@chat_registrator, [%{}])
     ]

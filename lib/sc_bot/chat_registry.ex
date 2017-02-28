@@ -4,12 +4,12 @@ defmodule ScBot.ChatRegistry do
 
   #API
   def start_link(state) do
-    Logger.info "#{__MODULE__}: "<> inspect(self()) <>" start_link"
+    #Logger.info "#{__MODULE__}: "<> inspect(self()) <>" start_link"
     GenServer.start_link(__MODULE__, [], name: :chat_registrator)
   end
 
   def process_chats(tasks) do
-    Logger.info "#{__MODULE__}." <> inspect(self()) <> " process"
+    #Logger.info "#{__MODULE__}." <> inspect(self()) <> " process"
     GenServer.cast(:chat_registrator, {:process_chats, tasks})
   end
 
@@ -18,22 +18,20 @@ defmodule ScBot.ChatRegistry do
   end
 
   #SERVER
-   def init(_) do
-     Logger.info "#{__MODULE__}: "<> inspect(self()) <>" init"
-     {:ok, []}
-   end
+  def init(_) do
+    #Logger.info "#{__MODULE__}: "<> inspect(self()) <>" init"
+    {:ok, []}
+  end
 
-   def handle_cast({:process_chats, chat_tasks}, state) do
-     Logger.info "#{__MODULE__}: "<> inspect(self()) <>" handle_cast " <>
-     Integer.to_string(Enum.count(chat_tasks))
-
-     Enum.map(chat_tasks, fn(task) -> proc_task(task, state) end)
-
+  def handle_cast({:process_chats, chat_tasks}, state) do
+    #Logger.info "#{__MODULE__}: "<> inspect(self()) <>" handle_cast " <>
+    Integer.to_string(Enum.count(chat_tasks))
+    Enum.map(chat_tasks, fn(task) -> proc_task(task, state) end)
     {:noreply, []}
   end
 
   def handle_call(:get_answers, _from, state) do
-    Logger.info "#{__MODULE__}: "<> inspect(self()) <>" handle_call "
+    #Logger.info "#{__MODULE__}: "<> inspect(self()) <>" handle_call "
     {:reply, ScBot.Chat.Supervisor.get_answers, []}
   end
 
@@ -44,9 +42,8 @@ defmodule ScBot.ChatRegistry do
 
     chat_id=task[:message][:chat][:id]
 
-    Logger.info "create new chat " <> Integer.to_string(chat_id)
+    #Logger.info "create new chat " <> Integer.to_string(chat_id)
     ScBot.Chat.Supervisor.start_chat(Integer.to_string(chat_id))
     ScBot.Chat.request(Integer.to_string(chat_id), task)
-
   end
 end
