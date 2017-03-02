@@ -44,7 +44,7 @@ defmodule ScBot.ChatRegistry do
           cond do
             String.match?(text, reg) ->
               ScBot.Chat.Supervisor.start_chat(Integer.to_string(chat_id))
-              [%ScBot.Message{chat_id: chat_id, text: "you succefull authorized! enter commands", reply_to_message_id: message_id}]
+              [%ScBot.Message{chat_id: chat_id, text: "you succefull authorized! Send <b>help</b> for get command list", reply_to_message_id: message_id}]
             true ->
               [%ScBot.Message{chat_id: chat_id, text: "Please Enter chat password", reply_to_message_id: message_id}]
           end

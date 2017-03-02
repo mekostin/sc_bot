@@ -48,7 +48,7 @@ defmodule ScBot.PollUpdatesTask do
 
   defp sendMessage(messages) do
     Enum.each(messages, fn(%ScBot.Message{chat_id: chat_id, text: text, reply_to_message_id: reply_to_message_id}) ->
-      HTTPoison.post(bot<>"/sendMessage", {:form, [chat_id: chat_id, text: text, reply_to_message_id: reply_to_message_id]}, @post_headers)
+      HTTPoison.post(bot<>"/sendMessage", {:form, [chat_id: chat_id, text: text, parse_mode: "HTML", reply_to_message_id: reply_to_message_id]}, @post_headers)
     end)
   end
 end
