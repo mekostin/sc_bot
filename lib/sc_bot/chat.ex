@@ -49,7 +49,7 @@ defmodule ScBot.Chat do
     case message[:message] do
       %{message_id: message_id, text: text, chat: %{id: chat_id}} ->
         cmd=String.split(text, " ")
-        responses=[%ScBot.Message{chat_id: chat_id, text: command(hd(cmd), List.last(tl(cmd))), reply_to_message_id: message_id} | responses]
+        responses=[%ScBot.Message{chat_id: chat_id, text: command(hd(cmd), hd((tl(cmd)))), reply_to_message_id: message_id} | responses]
         state=%State{state | responses: responses}
       _ -> Logger.error "cant parse request"
     end
@@ -62,22 +62,25 @@ defmodule ScBot.Chat do
     {:reply, Map.get(state, :responses), %State{state | responses: []}}
   end
 
-############## COMMANDS
+############## COMMANDS #######################################################
   defp command("help", param), do: Application.get_env(:sc_bot, :help_command)
-
-  defp command("info", param) do
-    table=hd(Regex.split(~r{_}, param))
-    select_sql("select data from bot.v_i#{table} where upper(item) like upper('#{param}%')")
-  end
-
-  defp command("status", param) do
-    table=hd(Regex.split(~r{_}, param))
-    select_sql("select data from bot.v_z#{table} where upper(item) like upper('#{param}%')")
-  end
-
+  defp command("info", param), do: get_item_info("bot.v_i", param)
+  defp command("status", param), do: get_item_info("bot.v_z", param)
   defp command(_,_), do: "uncknown cmd, please use <b>help</b>"
+###############################################################################
+
+  defp get_item_info(table, param) do
+    {:ok, item_reg}=Regex.compile(Application.get_env(:sc_bot, :item_regex))
+    cond do
+      String.match?(param, item_reg) ->
+        t=hd(Regex.split(~r{_}, param))
+        select_sql("select data from #{table}#{t} where item=upper('#{param}') LIMIT 1")
+      true -> command(nil, nil)
+    end
+  end
 
   defp select_sql(sql) do
+    #Logger.info sql
     {:ok, pid}=Postgrex.start_link(hostname: Application.get_env(:sc_bot, :db_hostname),
                                    username: Application.get_env(:sc_bot, :db_username),
                                    password: Application.get_env(:sc_bot, :db_password),
