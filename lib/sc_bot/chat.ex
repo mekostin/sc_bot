@@ -64,31 +64,31 @@ defmodule ScBot.Chat do
 
 ############## COMMANDS #######################################################
   defp command("help", param), do: Application.get_env(:sc_bot, :help_command)
-  defp command("info", param), do: get_item_info("bot.v_i", param)
-  defp command("status", param), do: get_item_info("bot.v_z", param)
+  defp command("info", param), do: get_item_info(Application.get_env(:sc_bot, :info_database), "bot.v_i", param)
+  defp command("status", param), do: get_item_info(Application.get_env(:sc_bot, :status_database), "bot.v_s", param)
   defp command(_,_), do: "uncknown cmd, please use <b>help</b>"
 ###############################################################################
 
-  defp get_item_info(table, param) do
+  defp get_item_info(database, table, param) do
     {:ok, item_reg}=Regex.compile(Application.get_env(:sc_bot, :item_regex))
     cond do
       String.match?(param, item_reg) ->
         t=hd(Regex.split(~r{_}, param))
-        select_sql("select data from #{table}#{t} where item=upper('#{param}') LIMIT 1")
+        select_sql(database, "select data from #{table}#{t} where item=upper('#{param}') LIMIT 1")
       true -> command(nil, nil)
     end
   end
 
-  defp select_sql(sql) do
+  defp select_sql(database, sql) do
     #Logger.info sql
     {:ok, pid}=Postgrex.start_link(hostname: Application.get_env(:sc_bot, :db_hostname),
                                    username: Application.get_env(:sc_bot, :db_username),
                                    password: Application.get_env(:sc_bot, :db_password),
-                                   database: Application.get_env(:sc_bot, :db_database))
+                                   database: database)
     %Postgrex.Result{command: :select, columns: ["data"], rows: rows, num_rows: num_rows}=Postgrex.query!(pid, sql, [])
     cond do
       num_rows>0 -> hd(hd(rows))
-      true       -> "Not find!"
+      true       -> "Not found!"
     end
   end
 end
