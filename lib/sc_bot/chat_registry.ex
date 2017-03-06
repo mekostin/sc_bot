@@ -37,6 +37,7 @@ defmodule ScBot.ChatRegistry do
   end
 
   def proc_task(task) do
+
     case task[:message] do
       %{message_id: message_id, text: text, chat: %{id: chat_id}} ->
         {:ok, reg}=Regex.compile(Application.get_env(:sc_bot, :chat_password))

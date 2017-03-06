@@ -42,6 +42,7 @@ defmodule ScBot.Mixfile do
       {:poison, "~> 1.3"},
       {:gproc, "0.3.1"},
       {:postgrex, ">= 0.9.1"}
+      #{:gen_stage, "~> 0.7"}
     ]
   end
 end

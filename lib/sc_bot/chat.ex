@@ -3,6 +3,7 @@ defmodule ScBot.Chat do
   require Logger
 
 
+
   defmodule State, do: defstruct responses: [], tasks: []
 
 
@@ -63,7 +64,7 @@ defmodule ScBot.Chat do
   end
 
 ############## COMMANDS #######################################################
-  defp command("help", param), do: Application.get_env(:sc_bot, :help_command)
+  defp command("help", _), do: Application.get_env(:sc_bot, :help_command)
   defp command("info", param), do: get_item_info(Application.get_env(:sc_bot, :info_database), "bot.v_i", param)
   defp command("status", param), do: get_item_info(Application.get_env(:sc_bot, :status_database), "bot.v_s", param)
   defp command(_,_), do: "uncknown cmd, please use <b>help</b>"
