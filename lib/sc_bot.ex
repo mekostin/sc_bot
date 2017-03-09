@@ -7,7 +7,6 @@ defmodule ScBot do
   @chat_registrator ScBot.ChatRegistry
   @chat_supervisor ScBot.Chat.Supervisor
   @forum ScBot.Forum
-  @forum_supervisor ScBot.Forum.Supervisor
 
   def version do
     {:ok, version}=:application.get_key(:sc_bot, :vsn)
@@ -18,9 +17,8 @@ defmodule ScBot do
     import Supervisor.Spec, warn: false
     children = [
       supervisor(@chat_supervisor, []),
-      #supervisor(@forum_supervisor, []),
       worker(@chat_registrator, []),
-      #worker(@forum, [])
+      worker(@forum, [])
     ]
 
     opts=[strategy: :one_for_one, name: :scbot_main]

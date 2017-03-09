@@ -41,6 +41,7 @@ defmodule ScBot.PollUpdatesTask do
     end
 
     sendMessage(ScBot.ChatRegistry.get_answers)
+    sendMessage(ScBot.Forum.get_answers)
 
    :timer.sleep(1000)
     poll(last_update_id)

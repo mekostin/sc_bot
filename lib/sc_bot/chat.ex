@@ -82,11 +82,14 @@ defmodule ScBot.Chat do
 
   defp select_sql(database, sql) do
     #Logger.info sql
-    {:ok, pid}=Postgrex.start_link(hostname: Application.get_env(:sc_bot, :db_hostname),
+    {:ok, pg_pid}=Postgrex.start_link(hostname: Application.get_env(:sc_bot, :db_hostname),
                                    username: Application.get_env(:sc_bot, :db_username),
                                    password: Application.get_env(:sc_bot, :db_password),
                                    database: database)
-    %Postgrex.Result{command: :select, columns: ["data"], rows: rows, num_rows: num_rows}=Postgrex.query!(pid, sql, [])
+    %Postgrex.Result{command: :select, columns: ["data"], rows: rows, num_rows: num_rows}=Postgrex.query!(pg_pid, sql, [])
+    Process.unlink(pg_pid)
+    Process.exit(pg_pid, :kill)
+    
     cond do
       num_rows>0 -> hd(hd(rows))
       true       -> "Not found!"
