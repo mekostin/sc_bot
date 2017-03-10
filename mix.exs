@@ -42,7 +42,8 @@ defmodule ScBot.Mixfile do
       {:poison, "~> 1.3"},
       {:gproc, "0.3.1"},
       {:postgrex, ">= 0.9.1"},
-      {:mysqlex, github: "tjheeta/mysqlex" }
+      {:mysqlex, github: "tjheeta/mysqlex"},
+      {:html_sanitize_ex, "~> 1.0.0"}
     ]
   end
 end
