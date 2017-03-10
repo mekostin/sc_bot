@@ -2,6 +2,8 @@ defmodule ScBot.Forum do
   use GenServer
   require Logger
 
+  defmodule State, do: defstruct responses: [], id_msg: 0
+
   #API
   def start_link do
     GenServer.start_link(__MODULE__, [], name: :forum)
@@ -13,28 +15,44 @@ defmodule ScBot.Forum do
 
   #SERVER
   def init(_) do
-    {:ok, []}
+    {:ok, %State{responses: [], id_msg: 0}}
   end
 
   def handle_call(:get_answers, _from, state) do
-    {:reply, [], state}
+    state=check_forum(state)
+    IO.inspect state
+    {:reply, Map.get(state, :responses), %State{state | responses: []}}
   end
 
   defp check_forum(state) do
-    {:ok, pid}=Mysqlex.start_link(hostname: Application.get_env(:sc_bot, :forum_hostname),
+    {:ok, pid}=Mysqlex.Connection.start_link(hostname: Application.get_env(:sc_bot, :forum_hostname),
                                   username: Application.get_env(:sc_bot, :forum_username),
                                   password: Application.get_env(:sc_bot, :forum_password),
                                   database: Application.get_env(:sc_bot, :forum_database))
-    %Postgrex.Result{command: :select, columns: ["data"], rows: rows, num_rows: num_rows}=Mysqlex.query!(pid, sql, [])
+
+    if Map.get(state, :id_msg)==0 do
+      sql=Application.get_env(:sc_bot, :forum_mess_id_sql)
+      {:ok, %Mysqlex.Result{columns: ["data"], rows: rows, num_rows: num_rows}}=Mysqlex.Connection.query!(pid, sql, [])
+      state=%State{state | id_msg: elem(hd(rows), 0)}
+      Logger.info "Get id_msg=" <> Integer.to_string(Map.get(state, :id_msg))
+    end
+
+    sql=Application.get_env(:sc_bot, :forum_messages_sql) <> Integer.to_string(Map.get(state, :id_msg))
+    #Logger.info sql
+
+    {:ok, %Mysqlex.Result{columns: ["data", "id_msg"], rows: rows, num_rows: num_rows}}=Mysqlex.Connection.query!(pid, sql, [])
     Process.unlink(pid)
     Process.exit(pid, :kill)
 
+    chat_id=Application.get_env(:sc_bot, :forum_chat_id)
+
     cond do
-      num_rows>0 -> Enum.reduce(rows, , )
-      true       -> "Not found!"
+      num_rows>0 ->
+         state=%State{state | responses: Enum.reduce(rows, [],
+                                               fn(x, acc) -> [%ScBot.Message{chat_id: chat_id, text: elem(x, 0)} | acc]  end)}
+         %State{state | id_msg: elem(Enum.max_by(rows, fn(x)-> elem(x, 1) end),1)}
+      true -> state
     end
-
-
   end
 
 end
