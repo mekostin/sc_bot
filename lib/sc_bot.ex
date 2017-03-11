@@ -18,7 +18,8 @@ defmodule ScBot do
     children = [
       supervisor(@chat_supervisor, []),
       worker(@chat_registrator, []),
-      worker(@forum, [])
+      worker(@forum, []),
+      worker(Task, [ScBot.TcpServer, :accept, [elem(Integer.parse(System.get_env("PORT"), 10), 0)]])
     ]
 
     opts=[strategy: :one_for_one, name: :scbot_main]
@@ -28,7 +29,7 @@ defmodule ScBot do
 
     Logger.info "Polling for updates.."
     Task.Supervisor.start_link(name: @task_poller_supervisor, restart: :transient, max_restarts: 0)
-    Task.Supervisor.start_child(@task_poller_supervisor, @task_poller, :poll, [0])
+    Task.Supervisor.start_child(@task_poller_supervisor, @task_poller, :poll, [0, 0])
     {:ok, spid}
   end
 end

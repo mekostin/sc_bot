@@ -6,7 +6,7 @@ defmodule ScBot.PollUpdatesTask do
   defp token, do: Application.get_env(:sc_bot, :bot_token)
   defp bot, do: "https://api.telegram.org/bot" <> token
 
-  def poll(last_update_id) do
+  def poll(last_update_id, times) do
     update_id=0
 #    Logger.info "Poll TelegramBot #{last_update_id}"
 
@@ -17,7 +17,7 @@ defmodule ScBot.PollUpdatesTask do
       url=url <> "?offset=" <> Integer.to_string(last_update_id)
     end
 
-#    Logger.info "url: #{url}"
+    #Logger.info "url: #{url}"
 
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
@@ -41,10 +41,13 @@ defmodule ScBot.PollUpdatesTask do
     end
 
     sendMessage(ScBot.ChatRegistry.get_answers)
-    sendMessage(ScBot.Forum.get_answers)
+    if (times==0) do
+      sendMessage(ScBot.Forum.get_answers)
+      times=10
+    end
 
-   :timer.sleep(10000)
-    poll(last_update_id)
+   :timer.sleep(1000)
+    poll(last_update_id, times-1)
   end
 
   defp sendMessage(messages) do
