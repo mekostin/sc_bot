@@ -31,10 +31,10 @@ defmodule ScBot.Forum do
                                   database: Application.get_env(:sc_bot, :forum_database))
 
     if Map.get(state, :id_msg)==0 do
-      # sql=Application.get_env(:sc_bot, :forum_mess_id_sql)
-      # {:ok, %Mysqlex.Result{columns: ["data"], rows: rows, num_rows: num_rows}}=Mysqlex.Connection.query!(pid, sql, [])
-      # state=%State{state | id_msg: elem(hd(rows), 0)}
-      state=%State{state | id_msg: 103575}
+      sql=Application.get_env(:sc_bot, :forum_mess_id_sql)
+      {:ok, %Mysqlex.Result{columns: ["data"], rows: rows}}=Mysqlex.Connection.query!(pid, sql, [])
+      state=%State{state | id_msg: elem(hd(rows), 0)}
+#      state=%State{state | id_msg: 103575}
       Logger.info "Get id_msg=" <> Integer.to_string(Map.get(state, :id_msg))
     end
 
@@ -50,9 +50,9 @@ defmodule ScBot.Forum do
     cond do
       num_rows>0 ->
          state=%State{state | responses: Enum.reduce(rows, [],
-                                               fn(x, acc) -> [%ScBot.Message{
-                                                                            chat_id: chat_id,
-                                                                            text: "<pre>" <> (elem(x, 0) |> HtmlSanitizeEx.strip_tags) <> "</pre>"
+                                        fn(x, acc) -> [%ScBot.Message{
+                                              chat_id: chat_id,
+                                              text: "<pre>" <> (elem(x, 0) |> HtmlSanitizeEx.strip_tags) <> "</pre>"
                                                                             } | acc]  end)}
          %State{state | id_msg: elem(Enum.max_by(rows, fn(x)-> elem(x, 1) end),1)}
       true -> state
