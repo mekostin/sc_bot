@@ -40,4 +40,4 @@ CONCAT(b.name, '
 <b>status atm_#</b> - show current connection status of ATM
 <b>status trouter_#</b> - show current connection status of trouter
 
-forum broadcasting invite link " <> System.get_env("PRIVATE_CHANNEL")
+forum broadcasting invite link "<> System.get_env("PRIVATE_CHANNEL")

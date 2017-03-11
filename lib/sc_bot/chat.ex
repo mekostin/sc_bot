@@ -44,13 +44,13 @@ defmodule ScBot.Chat do
   #  end
 
   def handle_cast({:request, message}, state) do
-    #Logger.info "CHAT " <> inspect(self()) <> ": requested "
+    Logger.info inspect(message)
 
     responses=Map.get(state, :responses)
     case message[:message] do
       %{message_id: message_id, text: text, chat: %{id: chat_id}} ->
         cmd=String.split(text, " ")
-        responses=[%ScBot.Message{chat_id: chat_id, text: command(hd(cmd), hd((tl(cmd)))), reply_to_message_id: message_id} | responses]
+        responses=[%ScBot.Message{chat_id: chat_id, text: command(hd(cmd), List.first((tl(cmd)))), reply_to_message_id: message_id} | responses]
         state=%State{state | responses: responses}
       _ -> Logger.error "cant parse request"
     end
@@ -89,7 +89,7 @@ defmodule ScBot.Chat do
     %Postgrex.Result{command: :select, columns: ["data"], rows: rows, num_rows: num_rows}=Postgrex.query!(pg_pid, sql, [])
     Process.unlink(pg_pid)
     Process.exit(pg_pid, :kill)
-    
+
     cond do
       num_rows>0 -> hd(hd(rows))
       true       -> "Not found!"
